@@ -20,7 +20,7 @@ if (!defined('__TYPECHO_ROOT_DIR__')) exit;
  *
  * @package LoginCaptcha
  * @author Ryan
- * @version 1.0.0
+ * @version 1.0.1
  * @link https://doufu.ru
  *
  */
@@ -79,7 +79,7 @@ class Plugin implements PluginInterface
                     let pwd = document.getElementById('password');
                     pwd?.parentNode?.insertAdjacentHTML('afterend', `<p id="captcha-section">
                         <label class="sr-only" for="captcha"><?php _e("验证码"); ?></label>
-                        <input type="text" name="captcha" id="captcha" class="text-l w-100" placeholder="<?php _e("验证码"); ?>" required />
+                        <input type="text" name="captcha" id="captcha" class="text-l w-100" pattern=".{4}" title="<?php _e("请输入4个字符") ?>" placeholder="<?php _e("验证码"); ?>" required />
                         <img id="captcha-img" src="<?php echo $secureUrl ?>" title="<?php _e("点击刷新") ?>" />
                     </p>`);
                     let img = document.getElementById('captcha-img');
@@ -99,6 +99,18 @@ class Plugin implements PluginInterface
             <style>
                 #captcha-section {
                     display: flex;
+                }
+
+                #captcha {
+                    box-sizing: border-box;
+                }
+
+                #captcha:invalid:not(:placeholder-shown) {
+                    border: 2px solid red; /* 不符合模式时显示红框 */
+                }
+
+                #captcha:valid {
+                    border: 2px solid green; /* 符合模式时显示绿框 */
                 }
 
                 #captcha-img {
