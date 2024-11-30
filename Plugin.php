@@ -20,7 +20,7 @@ if (!defined('__TYPECHO_ROOT_DIR__')) exit;
  *
  * @package LoginCaptcha
  * @author Ryan
- * @version 1.0.1
+ * @version 1.0.2
  * @link https://doufu.ru
  *
  */
@@ -52,9 +52,11 @@ class Plugin implements PluginInterface
     {
         $request = new Request(HttpRequest::getInstance());
         $response = new Response(HttpRequest::getInstance(), HttpResponse::getInstance());
-        $pathinfo = $request->getPathInfo();
-        if (preg_match("#/action/login#", $pathinfo)) {
-            if (!isset($_SESSION['captcha']) || strtolower($_POST['captcha']) != $_SESSION['captcha']) {
+        $pathInfo = $request->getPathInfo();
+        if (preg_match("#/action/login#", $pathInfo)) {
+            session_start();
+            $postCaptcha = $request->filter('strval')->get('captcha', '');
+            if (!isset($_SESSION['captcha']) || strtolower($postCaptcha) != strtolower($_SESSION['captcha'])) {
                 Notice::alloc()->set(_t('验证码错误'), 'error');
                 Cookie::set('__typecho_remember_captcha', '');
                 $response->goBack();
@@ -66,11 +68,11 @@ class Plugin implements PluginInterface
     {
         $request = new Request(HttpRequest::getInstance());
 //        $response = new Response(HttpRequest::getInstance(), HttpResponse::getInstance());
-        $pathinfo = $request->getRequestUri();
+        $pathInfo = $request->getRequestUri();
         $loginPath = Common::url('login.php', defined('__TYPECHO_ADMIN_DIR__') ?
             __TYPECHO_ADMIN_DIR__ : '/admin/');
         $secureUrl = Helper::security()->getIndex('login-captcha');
-        if (stripos($pathinfo, $loginPath) === 0) {
+        if (stripos($pathInfo, $loginPath) === 0) {
             ?>
             <script>
                 (function () {
